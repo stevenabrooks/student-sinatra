@@ -1,5 +1,10 @@
 require 'sinatra/base'
-require_relative 'lib/models/student.rb'
+require 'sqlite3'
+
+require_relative 'lib/concerns/persistable'
+require_relative 'lib/concerns/findable'
+
+require_relative 'lib/models/student'
 
 # Why is it a good idea to wrap our App class in a module?
 module StudentSite
@@ -28,5 +33,15 @@ module StudentSite
       erb :artists
     end
 
+    get '/students' do
+      @students = Student.all
+      erb :'students/students'
+    end
+
+    get '/students/:url' do
+      # @students = Student.all
+      @student = Student.find_by_url(params[:url])
+      erb :'students/student_profile'
+    end
   end
 end

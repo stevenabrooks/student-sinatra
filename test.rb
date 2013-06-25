@@ -3,7 +3,7 @@ require 'sqlite3'
 require 'pry-debugger'
 
 require_relative 'lib/concerns/persistable'
-
+require_relative 'lib/concerns/findable'
 require_relative 'lib/models/student'
 
 include Fis::Test
@@ -57,13 +57,12 @@ test 'should be able to update a student' do
   assert_equal Student.find(s.id).name, "Bob Whitney"
 end
 
-test 'should be able to retrive a student with a where statment' do
+test 'should be able to retrieve a student with a where statement' do
   s = Student.new
   s.name = "Jeff Baird"
   s.save
 
   assert_equal Student.where(:name => "Jeff Baird").map { |s| s.name }, [s.name]
-
 end
 
 test 'should be able to retrieve multiple students with the same name' do
@@ -75,18 +74,29 @@ test 'should be able to retrieve multiple students with the same name' do
   s2.name = "Alice Adams"
   s2.save
 
-
   assert_equal Student.where(:name => "Alice Adams").map {|s| s.name}, [s.name,s2.name]
 end
 
-test 'should be able to find_by any attribue' do
+test 'should be able to find_by any attribute' do
   s = Student.new
   s.name = "Avi Flombaum"
   s.tagline = "Hello World"
   s.bio = "Dean at Flatiron School"
   s.save
 
- assert_equal Student.find_by_tagline("Hello World").tagline, "Hello World"
- assert_equal Student.find_by_bio("Dean at Flatiron School").bio, "Dean at Flatiron School"
- assert_equal Student.find_by_name("Avi Flombaum").name, "Avi Flombaum"
+  assert_equal Student.find_by_tagline("Hello World").tagline, "Hello World"
+  assert_equal Student.find_by_bio("Dean at Flatiron School").bio, "Dean at Flatiron School"
+  assert_equal Student.find_by_name("Avi Flombaum").name, "Avi Flombaum"
+end
+
+test 'should return nil when find_by method fails to match' do
+  assert_equal Student.find(3409), nil
+  assert_equal Student.find_by_tagline("Hello Worl"), nil
+  assert_equal Student.find_by_bio("Dean at Flatiron Scho"), nil
+  assert_equal Student.find_by_name("Avi Flomb"), nil
+end
+
+test 'should return nil when where method fails to match & array otherwise' do
+  assert_equal Student.where(:name => "Avi Flombaum").class, Array
+  assert_equal Student.where(:name => "Avi Flombau"), nil
 end
