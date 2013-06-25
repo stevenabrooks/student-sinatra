@@ -27,6 +27,12 @@ class Student
     ATTRIBUTES
   end
 
+  def attributes
+    self.class.attributes.keys.collect do |attribute|
+      self.send(attribute)
+    end
+  end
+
   def self.attr_accessors
     self.attributes.keys.each do |k|
       attr_accessor k

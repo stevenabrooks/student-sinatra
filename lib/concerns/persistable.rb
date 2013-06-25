@@ -52,12 +52,6 @@ module Persistable
       persisted? ? update : insert
     end
 
-    def attributes
-      self.class.attributes.keys.collect do |attribute|
-        self.send(attribute)
-      end
-    end
-
     def attributes_for_sql
       self.attributes[1..-1]
     end
