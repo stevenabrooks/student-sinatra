@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'sqlite3'
-
+require 'shotgun'
+require 'debugger'
 require_relative 'lib/concerns/persistable'
 require_relative 'lib/concerns/findable'
 
@@ -10,27 +11,39 @@ require_relative 'lib/models/student'
 module StudentSite
   class App < Sinatra::Base
 
-    def initialize
-      super
-      @artists = ["Frank Sinatra", "Bing Crosby", "Bob\n\n\n\n", 1, 2, "dslajkffoiejfijasdlfl"]
-    end
-
-    def set_random_numbers(arg)
-      @random_numbers = arg
-    end
-
     get '/' do
-      "hello world!"
+      @students = Student.all
+      erb :'students/students'
     end
 
-    get '/hello-world' do
-      set_random_numbers((1..20).to_a)
-      p @random_numbers
-      erb :hello
+    get '/students/new' do
+      erb :'students/new'
     end
 
-    get '/artists' do
-      erb :artists
+    post '/students' do
+      new_dude = Student.new
+      new_dude.name = params[:name]
+      new_dude.tagline = params[:tagline]
+      new_dude.bio = params[:bio]
+      new_dude.twitter = params[:twitter]
+      new_dude.save
+      @students = Student.all      
+      erb :'students/students'
+    end
+
+    get '/students/:id/edit' do
+      @student = Student.find_by_id(params[:id])
+      erb :'students/edit'
+    end
+
+    post '/students/:id' do
+      @student = Student.find_by_id(params[:id])
+      @student.name = params[:name]
+      # new_dude.tagline = params[:tagline]
+      # new_dude.bio = params[:bio]
+      # new_dude.twitter = params[:twitter]
+      @student.save
+      erb :'students/student_profile'
     end
 
     get '/students' do
@@ -38,10 +51,16 @@ module StudentSite
       erb :'students/students'
     end
 
-    get '/students/:url' do
+    get '/students/:id' do
       # @students = Student.all
-      @student = Student.find_by_url(params[:url])
+      @student = Student.find_by_id(params[:id])
       erb :'students/student_profile'
     end
   end
 end
+
+# get '/students/1/edit' to display a 
+# form to edit a student
+
+
+
